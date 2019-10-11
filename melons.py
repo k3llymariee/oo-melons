@@ -16,13 +16,17 @@ class AbstractMelonOrder():
 
     def get_base_price(self):
         random_price = randint(5, 9)
-        print(random_price)
+
         base_price = random_price * 1.5 if self.species == 'Christmas' else random_price
-        # psuedocode for rush hour prices:
-        # if the local time is between 8am and 11am M-F
-        # then we add an extra $4 PER MELON
-        # M = tm_wday 0 and F = tm_wday 4
-        # 8am = tm_hour 8 and 11am = tm_hour 11
+
+        order_time = localtime()
+        order_hour = order_time.tm_hour
+        order_day = order_time.tm_wday
+
+        # Rush hour is 8am to 11am, M-F
+        if order_hour in range(8,12) and order_day in range(0,5):
+            base_price += 4
+
         return base_price         
 
 
@@ -51,13 +55,18 @@ class DomesticMelonOrder(AbstractMelonOrder):
     """A melon order within the USA."""
 
     def __init__(self, species, qty):
-        super().__init__(species, qty, country_code='USA', order_type='domestic', tax=0.08)
-        
+        super().__init__(species, qty, 
+                        country_code='USA', 
+                        order_type='domestic', 
+                        tax=0.08)
+
 class InternationalMelonOrder(AbstractMelonOrder):
     """An international (non-US) melon order."""
 
     def __init__(self, species, qty, country_code):
-        super().__init__(species, qty, country_code, order_type='international', tax=0.17)
+        super().__init__(species, qty, country_code, 
+                        order_type='international', 
+                        tax=0.17)
 
 
 class GovernmentMelonOrder(AbstractMelonOrder):
@@ -65,7 +74,10 @@ class GovernmentMelonOrder(AbstractMelonOrder):
     passed_inspection = False
 
     def __init__(self, species, qty):
-        super().__init__(species, qty, country_code='USA', order_type='domestic', tax=0.00)
+        super().__init__(species, qty, 
+                        country_code='USA', 
+                        order_type='domestic', 
+                        tax=0.00)
 
     def mark_inspection(self, passed):
         """Record the fact than an order has been inspected."""
